@@ -7,6 +7,7 @@ from downloader import download_informe
 from gemini import PreAuthAgent
 from datetime import datetime
 import time
+import use_ia_response from page_edit
 
 load_dotenv()
 
@@ -82,11 +83,8 @@ for item in cleaned_response:
         medical_report_path=item["informe_medico_link"],
         policy_data=item["Poliza"]
     )
-    gemini_response.append({
-        "ID": item["ID"],
-        "Estado Actual": item["Estado"],
-        "Procedimiento Sugerido": item["Procedimiento Sugerido"],
-        "Poliza": item["Poliza"],
-        "Resultado Gemini": result
-    })
+    gemini_response.append(result)
     time.sleep(60)
+
+for item in gemini_response:
+    use_ia_response(item)
