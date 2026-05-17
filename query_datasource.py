@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 import requests
 import json
-from downloader import download_informes
+from downloader import download_informe
 
 load_dotenv()
 
@@ -56,17 +56,15 @@ cleaned_response = []
 
 for item in response.json()['results']:
     field = item["properties"]
-
+    download_informe(field.get("Informe Medico").get('files')[0].get('file').get('url'), item["id"])
     cleaned_response.append({
         "ID": item["id"],
         "Estado": field.get("Estado").get('select').get('name'),
         "Procedimiento Sugerido": field.get("Procedimiento Sugerido").get('rich_text')[0].get('text').get('content'),
-        "informe_medico_link": field.get("Informe Medico").get('files')[0].get('file').get('url'),
+        "informe_medico_link": f"informes_descargados/informe_{item['id']}.pdf",
         "Fecha de Afiliación": field.get("Fecha de Afiliacion").get('date').get('start'),
         "Poliza": seguros.get(field.get("Poliza del Seguro").get('relation')[0].get('id'), "No encontrado"),
     })
-
-download_informes(cleaned_response)
 
 with open('query_database.json', 'w') as f:
     json.dump(response.json(), f, indent=4)
