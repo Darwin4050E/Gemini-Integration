@@ -56,9 +56,9 @@ class PreAuthAgent:
                 ---
                 Analiza los datos y genera el resultado siguiendo este esquema JSON:
                 {
-                    "estado": "APROBADO" | "RECHAZADO" | "PENDIENTE_DOCUMENTOS",
+                    "estado": "PREAPROBADO" | "RECHAZADO",
+                    "page_id": "ID de la página que se te entregó",
                     "justificacion": "Breve explicación técnica",
-                    "documentos_faltantes": ["lista", "de", "strings"]
                 }
                 """
             ]

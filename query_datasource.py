@@ -68,5 +68,5 @@ for item in response.json()['results']:
 for item in cleaned_response:
     print(item)
 
-with open('query_database.json', 'w') as f:
+with open('query_datasource.json', 'w') as f:
     json.dump(response.json(), f, indent=4)
