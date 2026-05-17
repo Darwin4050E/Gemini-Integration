@@ -18,6 +18,10 @@ def use_ia_response(response):
     
     page_id = response.get("page_id")
 
+    if not page_id:
+        print(f"Error: No se proporcionó 'page_id' en la respuesta de IA. No se puede actualizar la página.")
+        return
+
     url = f"https://api.notion.com/v1/pages/{page_id}"
 
     payload = {
@@ -49,3 +53,5 @@ def use_ia_response(response):
     }
 
     response = requests.patch(url, json=payload, headers=headers)
+
+    print(f'DEBUG: Actualización completada para la página {page_id}')

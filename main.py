@@ -59,6 +59,10 @@ cleaned_response = []
 
 for item in response.json()['results']:
     field = item["properties"]
+
+    if field.get("Estado").get('select').get('name') != 'Pendiente':
+        continue
+
     download_informe(field.get("Informe Medico").get('files')[0].get('file').get('url'), item["id"])
     
     cleaned_response.append({
@@ -69,7 +73,7 @@ for item in response.json()['results']:
         "informe_medico_path": f"informes_descargados/informe_{item['id']}.pdf"
     })
 
-gemini_response = []
+    print(f"DEBUG: Procesado el caso con ID {item['id']} - Procedimiento: {field.get('Procedimiento Sugerido').get('rich_text')[0].get('text').get('content')}")
 
 agent = PreAuthAgent(api_key=os.getenv("GEMINI_API_KEY"))
 
@@ -80,10 +84,9 @@ for item in cleaned_response:
         date_afiliation=item["Fecha de Afiliación"],
         suggested_procedure=item["Procedimiento Sugerido"],
         medical_report_path=item["informe_medico_path"],
-        policy_data=item["Poliza"]
+        policy_data=item["Póliza"]
     )
-    gemini_response.append(result)
+    print(f"DEBUG: Resultado de IA para el caso {item['ID']} -> {result}")
+    result["page_id"] = item["ID"]
+    use_ia_response(result)
     time.sleep(60)
-
-for item in gemini_response:
-    use_ia_response(item)

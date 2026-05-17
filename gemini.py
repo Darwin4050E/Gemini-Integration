@@ -33,7 +33,6 @@ class PreAuthAgent:
             contents = [
                 "ROLE:\n---\nActúa como un Auditor Médico experto en pre-autorizaciones quirúrgicas. Tu objetivo es decidir instantáneamente si una cirugía procede basándote en datos técnicos.\n---",
                 "CONTEXTO METADATOS:\n---",
-                f"ID del Caso: {item_id}",
                 f"Fecha de Hoy: {current_date}",
                 f"Fecha de Afiliación del Paciente: {date_afiliation}",
                 f"Procedimiento Solicitado: {suggested_procedure}",
@@ -48,15 +47,14 @@ class PreAuthAgent:
                 ---
                 Cobertura: Busca el 'Procedimiento Solicitado' en el texto de la 'Póliza'. Si el procedimiento está en una lista de "Exclusiones" o no figura como beneficio, marca como RECHAZADO.
                 ---
-                Justificación Médica: El 'Informe Médico' debe mencionar un diagnóstico que sea coherente con la cirugía. Si el informe está incompleto o es vago, marca como FALTAN DATOS. 
+                Justificación Médica: El 'Informe Médico' debe mencionar un diagnóstico que sea coherente con la cirugía. Si el informe está incompleto o es vago, en la justificación explica que faltan datos y los datos faltantes. 
                 ---
                 FORMATO DE SALIDA (Responde solo esto):
                 ---
                 Analiza los datos y genera el resultado siguiendo este esquema JSON:
                 {
-                    "estado": "APROBADO" | "RECHAZADO" | "PENDIENTE_DOCUMENTOS",
-                    "justificacion": "Breve explicación técnica",
-                    "documentos_faltantes": ["lista", "de", "strings"]
+                    "estado": "PREAPROBADO" | "RECHAZADO",
+                    "justificacion": "Breve explicación técnica de la decisión tomada",
                 }
                 """
             ]
