@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 import requests
 import json
 from downloader import download_informe
+from gemini import PreAuthAgent
+from datetime import datetime
+import time
 
 load_dotenv()
 
@@ -56,12 +59,7 @@ cleaned_response = []
 
 for item in response.json()['results']:
     field = item["properties"]
-
-    if field.get("Estado").get('select').get('name') != 'Pendiente':
-        continue
-
     download_informe(field.get("Informe Medico").get('files')[0].get('file').get('url'), item["id"])
-    
     cleaned_response.append({
         "ID": item["id"],
         "Estado": field.get("Estado").get('select').get('name'),
@@ -71,5 +69,24 @@ for item in response.json()['results']:
         "Poliza": seguros.get(field.get("Poliza del Seguro").get('relation')[0].get('id'), "No encontrado"),
     })
 
-with open('query_database.json', 'w') as f:
-    json.dump(response.json(), f, indent=4)
+gemini_response = []
+
+agent = PreAuthAgent(api_key=os.getenv("GEMINI_API_KEY"))
+
+for item in cleaned_response:
+    result = agent.process_authorization(
+        item_id=item["ID"],
+        current_date= datetime.now().strftime("%d de %B de %Y"),
+        date_afiliation=item["Fecha de Afiliación"],
+        suggested_procedure=item["Procedimiento Sugerido"],
+        medical_report_path=item["informe_medico_link"],
+        policy_data=item["Poliza"]
+    )
+    gemini_response.append({
+        "ID": item["ID"],
+        "Estado Actual": item["Estado"],
+        "Procedimiento Sugerido": item["Procedimiento Sugerido"],
+        "Poliza": item["Poliza"],
+        "Resultado Gemini": result
+    })
+    time.sleep(60)
