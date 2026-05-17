@@ -91,3 +91,12 @@ def main():
         result["page_id"] = item["ID"]
         use_ia_response(result)
         time.sleep(60)
+
+    if os.path.isdir("informes_descargados"):
+        for archivo in os.listdir("informes_descargados"):
+            ruta_archivo = os.path.join("informes_descargados", archivo)
+            if os.path.isfile(ruta_archivo):
+                os.remove(ruta_archivo)
+
+if __name__ == "__main__":
+    main()

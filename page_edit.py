@@ -11,7 +11,7 @@ def use_ia_response(response):
         "PENDIENTE": "90c57792-09db-4576-b58e-70b8df146350"
     }
 
-    status_id = status_dict.get(response.get("estado"), "81a26fb4-7234-45b4-b169-d940cf2250b1")
+    status_id = status_dict.get(response.get("estado"), "90c57792-09db-4576-b58e-70b8df146350")
 
     if status_id == status_dict["PENDIENTE"]:
         return

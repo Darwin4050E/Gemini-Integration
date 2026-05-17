@@ -1,4 +1,5 @@
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 import os
 import json
 from dotenv import load_dotenv
@@ -8,7 +9,8 @@ load_dotenv()
 class PreAuthAgent:
 
     def __init__(self, api_key:str):
-        genai.configure(api_key=api_key)
+        self.client = genai.Client(api_key=api_key)
+
         self.system_instruction = (
             "Eres un Agente de Pre-Autorización Médica experto. Tu tarea es comparar "
             "un informe médico contra una póliza de seguro. "
@@ -18,18 +20,24 @@ class PreAuthAgent:
             "3. Si falta información, marca el estado como 'PENDIENTE_DOCUMENTOS'.\n"
             "4. Responde ÚNICAMENTE en formato JSON."
         )
-        self.model = genai.GenerativeModel(
-            model_name="gemini-2.5-flash",
-            generation_config={"response_mime_type": "application/json"},
+
+        self.model_name = "gemini-2.5-flash"
+
+        self.config = types.GenerateContentConfig(
+            response_mime_type="application/json",
             system_instruction=self.system_instruction
         )
     
     def process_authorization(self, item_id:str, current_date:str, date_afiliation:str, suggested_procedure:str, medical_report_path:str, policy_data:str) -> dict:
+
         if not os.path.exists(medical_report_path):
             return {"error": f"Error de infraestructura: El archivo PDF no existe en la ruta proporcionada."}
+        
         uploaded_report = None
+
         try:
-            uploaded_report = genai.upload_file(medical_report_path, mime_type="application/pdf")
+            uploaded_report = self.client.files.upload(file=medical_report_path)
+
             contents = [
                 "ROLE:\n---\nActúa como un Auditor Médico experto en pre-autorizaciones quirúrgicas. Tu objetivo es decidir instantáneamente si una cirugía procede basándote en datos técnicos.\n---",
                 "CONTEXTO METADATOS:\n---",
@@ -58,10 +66,17 @@ class PreAuthAgent:
                 }
                 """
             ]
-            response = self.model.generate_content(contents)
+
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=contents,
+                config=self.config  
+            )
+
             return json.loads(response.text)
+        
         except Exception as e:
             return {"error": f"Error en el procesamiento de Gemini: {str(e)}"}
         finally:
             if uploaded_report:
-                uploaded_report.delete()
+                self.client.files.delete(name=uploaded_report.name)
