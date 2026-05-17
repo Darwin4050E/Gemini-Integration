@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 import requests
-import json
 
 load_dotenv()
 
@@ -50,11 +49,3 @@ def use_ia_response(response):
     }
 
     response = requests.patch(url, json=payload, headers=headers)
-
-# mock_response = {
-#     "estado": "RECHAZADO",
-#     "page_id": "361e10c6-1951-8022-95a2-db913725c399",
-#     "justificacion": "El paciente no cumple con el periodo de carencia mínimo de 180 días, ya que su fecha de afiliación es el 10 de enero de 2024 y la fecha actual es el 14 de mayo de 2026."
-# }
-
-# use_ia_response(mock_response)
