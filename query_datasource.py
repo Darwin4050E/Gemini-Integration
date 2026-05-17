@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 import requests
 import json
+from downloader import download_informes
 
 load_dotenv()
 
@@ -65,8 +66,7 @@ for item in response.json()['results']:
         "Poliza": seguros.get(field.get("Poliza del Seguro").get('relation')[0].get('id'), "No encontrado"),
     })
 
-for item in cleaned_response:
-    print(item)
+download_informes(cleaned_response)
 
 with open('query_datasource.json', 'w') as f:
     json.dump(response.json(), f, indent=4)
